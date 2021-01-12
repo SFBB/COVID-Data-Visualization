@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>COVID-19 (Coronavirus) map and timeline dashboard</title>
+<meta name="description" content="Free embeddable interactive dashboard showing map and timeline of COVID-19 (Coronavirus) outbreak. Data updated hourly with global and per-country stats." />
+<meta property="og:title" content="COVID-19 spread timeline dashboard" />
+<meta property="og:description" content="An embeddable dashboard to visualize COVID-19 spread timeline and affected regions." />
+<meta property="og:url" content="https://covid.amcharts.com" />
+<meta property="og:site_name" content="amCharts" />
+<meta property="og:image" content="https://covid.amcharts.com/screenshot.png" />
+
+<!-- <script src="./deps/amcharts4/core.js"></script>
+<script src="./deps/amcharts4/charts.js"></script>
+<script src="./deps/amcharts4/maps.js"></script>
+<script src="./deps/amcharts4/themes/dark.js"></script>
+<script src="./deps/amcharts4/themes/animated.js"></script> -->
+<!-- <script src="./deps/amcharts4-geodata/worldLow.js"></script>
+<script src="./deps/amcharts4-geodata/data/countries2.js"></script> -->
+
+<script src="./deps/jquery/jquery-3.3.1.min.js"></script>
+<!-- <link rel="stylesheet" media="all" href="deps/datatables/css/jquery.dataTables.min.css" /> -->
+<!-- <link rel="stylesheet" media="all" href="deps/datatables/css/select.dataTables.min.css" /> -->
+<script src="./deps/datatables/js/jquery.dataTables.min.js"></script>
+<script src="./deps/datatables/js/dataTables.select.min.js"></script>
+
+<!-- <script src="./data/js/world_timeline.js?ts=1609668108"></script> -->
+<!-- <script src="./data/js/total_timeline.js?ts=1609668108"></script> -->
+
+<!-- <link rel="stylesheet" media="all" href="examples/dashboard/dark.css" /> -->
+
+<!-- <script src="./examples/dashboard/app.js?ts=1609668108"></script> -->
+<style type="text/css">
+      #items {
+        padding-bottom: 100px;
+      }
+
+      #info {
+        position: absolute;
+        background: #444;
+        box-sizing: border-box;
+        padding: 5px;
+        bottom: 0;
+        margin-right: 20px;
+        margin-bottom: 0px;
+      }
+
+      p {
+        margin: 5px;
+      }
+
+      a {
+        color: #fff;
+      }
+
+      small {
+        color: #777;
+      }
+
+      .tools {
+        margin-top: 1em;
+      }
+
+      .button {
+        float: right;
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 10px;
+        background: #5276b0;
+        font-size: 0.8em;
+        color: #fff;
+        text-decoration: none;
+      }
+
+      .button:hover {
+        background: #525ab0;
+      }
+    </style>
+</head>
+<body>
+  <div id="app">
+  </div>
+<!-- <script>
+      var ts=1609668108;
+      var updated = new Date(ts * 1000);
+      var udpatedStr = "";
+      try {
+        var options = {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          timeZone: "UTC",
+          timeZoneName: "short"
+        };
+        var lang = navigator.languages ? navigator.languages[0] : "en-US";
+        udpatedStr = updated.toLocaleDateString(lang, options);
+      } catch(e) {
+        udpatedStr = udpated.toString();
+      }
+      document.getElementById("updated").innerHTML = udpatedStr;
+    </script> -->
+
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-22221037-7"></script> -->
+<!-- <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-22221037-7');
+</script> -->
+</body>
+</html>
