@@ -1,5 +1,9 @@
 <template>
   <div id="CountryTable">
+    <div id="couOver">
+    </div>
+    <div id="selectordiv">
+    </div>
    <table>
      <thead>
        <tr>
@@ -40,10 +44,20 @@
     // import Vue from 'https://unpkg.com/vue@2.6.0/dist/vue.esm.browser.min.js';
 //   import HelloWorld from 'HelloWorld'
     import HelloWorld from './HelloWorld.vue'
-
+    import * as am4plugins_rangeSelector from "@amcharts/amcharts4/plugins/rangeSelector"; 
+    import * as am4charts from "@amcharts/amcharts4/charts";
+    import * as am4core from "@amcharts/amcharts4/core";
+    import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+    import axios from "axios";
 
     
+
     // console.log(HelloWorld.methods.test(1));
+    
+
+
+
+
 
 
 
@@ -91,6 +105,68 @@
                 // console.log("Shown!");
                 // console.log(this.Shown);
             }.bind(this));
+
+
+
+
+
+            axios.get("http://127.0.0.1:5000//api/overview_all")
+              .then( function(Response) {
+                am4core.useTheme(am4themes_animated);
+
+                var chart = am4core.create("couOver", am4charts.XYChart);
+                console.log(chart);
+
+                // chart.language.locale = am4lang_es_ES;
+
+                chart.paddingRight = 20;
+
+                var data = [];
+                var visits = 10;
+                for (var i = 1; i < 50000; i++) {
+                  visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+                  data.push({ date: new Date(2018, 0, i), value: visits });
+                }
+
+                // console.log(data);
+                chart.data = data;
+
+                var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                dateAxis.renderer.grid.template.location = 0;
+                dateAxis.minZoomCount = 5;
+
+
+                // this makes the data to be grouped
+                dateAxis.groupData = true;
+                dateAxis.groupCount = 500;
+
+                var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+
+                var series = chart.series.push(new am4charts.LineSeries());
+                series.dataFields.dateX = "date";
+                series.dataFields.valueY = "value";
+                series.tooltipText = "{valueY}";
+                series.tooltip.pointerOrientation = "vertical";
+                series.tooltip.background.fillOpacity = 0.5;
+
+                chart.cursor = new am4charts.XYCursor();
+                chart.cursor.xAxis = dateAxis;
+
+                var scrollbarX = new am4core.Scrollbar();
+                scrollbarX.marginBottom = 20;
+                chart.scrollbarX = scrollbarX;
+
+                // Add range selector
+                var selector = new am4plugins_rangeSelector.DateAxisRangeSelector();
+                selector.container = document.getElementById("selectordiv");
+                selector.axis = dateAxis;
+
+                chart.language.setTranslationAny("%1Y", "%1A");
+                chart.language.setTranslationAny("%1M", "%1M");
+                chart.language.setTranslationAny("YTD", "ESTE AÑO");
+                chart.language.setTranslationAny("MAX", "TODO");
+              });
+
         },
         methods: {
             "sortTable": function sortTable(col) {
@@ -248,4 +324,15 @@ table tbody tr:nth-child(2n) td {
   padding: 1px;
   min-width: 10px;
 }
+#couOver {
+  width: 100%;
+  height: 500px;
+  max-width: 100%;
+}
+
+#selectordiv {
+  width: 100%;
+  height: 30px;
+}
+
 </style>
