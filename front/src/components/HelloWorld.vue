@@ -47,7 +47,8 @@ export default {
       Shown: {},
       records: {},
       realdata: null,
-      bubbleSeriess: null
+      bubbleSeriess: null,
+      showing: "新增确诊"
     }
   },
   mounted(){
@@ -312,6 +313,7 @@ export default {
     this.$root.$on('datashowing', function(data_to_show) {
       
       console.log(data_to_show);
+      this.showing = data_to_show;
       bubbleSeries.dataFields.value = data_to_show;
       polygonSeries.dataFields.value = data_to_show;
       // // bubbleSeries.data = temp;
@@ -414,8 +416,9 @@ export default {
       couL = couL.slice(0, couL.length-1);
       console.log(couL);
       if(couL!="")
-        axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL)
+        axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL+"&type="+this.showing)
           .then( function(Response) {
+            console.log(Response.data.countries);
           });
       // cou = [...countries];
       // cou.forEach(function(cc, index){
