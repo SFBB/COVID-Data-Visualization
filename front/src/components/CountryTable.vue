@@ -283,6 +283,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
             "filter": function filter(Shown) {
               var temp = [...this.realrows];
               this.realrows.forEach(function(cou, ind){
+                // console.log(this.realrows);
                 if(!Shown[cou.id]){
                   // console.log(cou.id);
                   if(temp.indexOf(cou)  > -1)
@@ -291,6 +292,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
                 // if(this.records[cou.id])
                 //   this.records[cou.id].isActive = this.Shown[cou.id];
               }.bind(this));
+              console.log("sadasdasd");
               this.rows = temp;
             },
             "clear": function clear() {

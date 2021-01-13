@@ -29,6 +29,7 @@ import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import axios from "axios";
 import { fitNumberRelative } from '@amcharts/amcharts4/.internal/core/utils/Utils';
 
+
 // console.log(JSON.parse(JSON.stringify(covid_world_timeline[0].list)));
 // console.log(dt);
 
@@ -385,14 +386,17 @@ export default {
           this.records[cou.id].isActive = this.Shown[cou.id];
       }.bind(this));
       // this.realdata = [...temp];
-      this.bubbleSeriess.data = temp;
+      this.bubbleSeriess.data = JSON.parse(JSON.stringify(temp));
       this.$root.$emit('filter', this.Shown);
       // axios.get("http://127.0.0.1:5000/api/countries_")
       //   .then( function(Response) {
       //   });
     },
     "clear": function clear() {
+      // console.log(this.realdata);
+      // console.log(this.Shown);
       this.realdata.forEach(function(cou){
+        // console.log(cou.id);
         this.Shown[cou.id] = false;
       }.bind(this));
       this.dataShown();
