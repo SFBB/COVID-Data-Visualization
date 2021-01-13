@@ -330,7 +330,7 @@ export default {
       axios.get("http://127.0.0.1:5000//api/countries_")
         .then((Response) => {
           // var mapData = Response.data.countries;
-          console.log(Response.data.countries);
+          console.log(Response.data);
           func(Response.data.countries);
           // this.MapData = Response.data.countries;
         });

@@ -1,8 +1,11 @@
 <template>
   <div id="CountryTable">
     <div id="couOver">
+      <!-- <button>Invalidate</button> -->
     </div>
     <div id="selectordiv">
+    </div>
+    <div id="invalidate">
     </div>
    <table>
      <thead>
@@ -86,7 +89,10 @@
                   "累计治愈": false,
                   "累计确诊": true,
                   "重症病例": false,
-                }
+                },
+                showing: "累计确诊",
+                chart: null,
+                series: null
                 }
         },
         mounted() {
@@ -110,12 +116,13 @@
 
 
 
-            axios.get("http://127.0.0.1:5000//api/overview_all")
+            axios.get("http://127.0.0.1:5000//api/overview"+this.showing)
               .then( function(Response) {
                 am4core.useTheme(am4themes_animated);
 
                 var chart = am4core.create("couOver", am4charts.XYChart);
-                console.log(chart);
+                this.chart = chart;
+                // console.log(chart);
 
                 // chart.language.locale = am4lang_es_ES;
 
@@ -128,8 +135,13 @@
                   data.push({ date: new Date(2018, 0, i), value: visits });
                 }
 
+                var dates_t = [...Response.data.dates]
+                dates_t.forEach(function(date, index){
+                  Response.data.dates[index].date = new Date(date.date);
+                });
                 // console.log(data);
-                chart.data = data;
+                chart.data = Response.data.dates;
+                // console.log(Response.data.dates);
 
                 var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
                 dateAxis.renderer.grid.template.location = 0;
@@ -143,8 +155,9 @@
                 var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
                 var series = chart.series.push(new am4charts.LineSeries());
+                this.series = series;
                 series.dataFields.dateX = "date";
-                series.dataFields.valueY = "value";
+                series.dataFields.valueY = this.showing;
                 series.tooltipText = "{valueY}";
                 series.tooltip.pointerOrientation = "vertical";
                 series.tooltip.background.fillOpacity = 0.5;
@@ -165,10 +178,30 @@
                 chart.language.setTranslationAny("%1M", "%1M");
                 chart.language.setTranslationAny("YTD", "ESTE AÑO");
                 chart.language.setTranslationAny("MAX", "TODO");
-              });
+              }.bind(this));
+
+
+              var button = am4core.create("invalidate", am4core.PlayButton);
+                button.events.on("toggled", function(event) {
+                  if (event.target.isActive) {
+                    console.log("asda");
+                  } else {
+                    console.log("526566");
+                  }
+                });
+
+
+
 
         },
         methods: {
+            "update_overview": function update_overview() {
+              axios.get("http://127.0.0.1:5000//api/overview"+this.showing)
+              .then( function(Response) {
+                this.chart.data = Response.data.dates;
+                this.series.dataFields.valueY = this.showing;
+              }.bind(this));
+            },
             "sortTable": function sortTable(col) {
                 if (this.sortColumn === col) {
                 this.ascending = !this.ascending;
@@ -207,6 +240,7 @@
             },
             "datashown": function(data_to_show) {
               this.Data_Showing[data_to_show] = !this.Data_Showing[data_to_show];
+              this.showing = data_to_show;
               // this.Data_Showing["累计确诊"] = false;
               Object.keys(this.Data_Showing).forEach(function(key, index){
                 if(key != data_to_show){
@@ -214,6 +248,7 @@
                 }
               }.bind(this));
               this.$root.$emit('datashowing', data_to_show);
+              this.update_overview();
             }
         },
         watch: {
@@ -227,6 +262,7 @@
                 if (this.rows.length == 0) {
                     return [];
                 }
+                console.log(Object.keys(this.rows[0]));
                 return Object.keys(this.rows[0]);
             },
             "datashowing": function datashowing() {
