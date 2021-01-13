@@ -5,8 +5,7 @@
     </div>
     <div id="selectordiv">
     </div>
-    <div id="invalidate">
-    </div>
+    <button v-on:click="refresh()">Invalidate</button>
    <table>
      <thead>
        <tr>
@@ -52,6 +51,7 @@
     import * as am4core from "@amcharts/amcharts4/core";
     import am4themes_animated from "@amcharts/amcharts4/themes/animated";
     import axios from "axios";
+import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
 
     
 
@@ -80,6 +80,7 @@
                     { id: 5, name: "Joey Tribbiani", phone: '972-297-6037', profession: 'Actor' },
                     { id: 6, name: "Phoebe Buffay", phone: '760-318-8376', profession: 'Masseuse' }
                 ],
+                realrows: null,
                 Shown: {},
                 Data_Showing: {
                   "仍在治疗": false,
@@ -92,7 +93,8 @@
                 },
                 showing: "累计确诊",
                 chart: null,
-                series: null
+                series: null,
+                selector: null
                 }
         },
         mounted() {
@@ -101,6 +103,7 @@
             HelloWorld.methods.get_data(1, function(result){
                 // console.log(result);
                 this.rows = [...result];
+                this.realrows = [...this.rows];
                 // this.Shown = [];
                 result.forEach(function(cou, ind){
                     // console.log(cou.id);
@@ -116,7 +119,7 @@
 
 
 
-            axios.get("http://127.0.0.1:5000//api/overview"+this.showing)
+            axios.get("http://127.0.0.1:5000/api/overview"+this.showing)
               .then( function(Response) {
                 am4core.useTheme(am4themes_animated);
 
@@ -171,6 +174,7 @@
 
                 // Add range selector
                 var selector = new am4plugins_rangeSelector.DateAxisRangeSelector();
+                this.selector = selector;
                 selector.container = document.getElementById("selectordiv");
                 selector.axis = dateAxis;
 
@@ -181,14 +185,26 @@
               }.bind(this));
 
 
-              var button = am4core.create("invalidate", am4core.PlayButton);
-                button.events.on("toggled", function(event) {
-                  if (event.target.isActive) {
-                    console.log("asda");
-                  } else {
-                    console.log("526566");
-                  }
-                });
+              // var button = am4core.create("invalidate", am4core.PlayButton);
+              //   button.events.on("toggled", function(event) {
+              //     if (event.target.isActive) {
+              //       console.log(event.target);
+              //       console.log(event.target.setPropertyValue("isActive", false));
+                    
+              //     } else {
+              //       console.log("526566");
+              //     }
+              //   });
+
+
+            this.$root.$on('clear', function() {
+              this.clear();
+            }.bind(this));
+
+            this.$root.$on('filter', function(Shown) {
+              console.log("Filter!");
+              this.filter(Shown);
+            }.bind(this));
 
 
 
@@ -196,7 +212,7 @@
         },
         methods: {
             "update_overview": function update_overview() {
-              axios.get("http://127.0.0.1:5000//api/overview"+this.showing)
+              axios.get("http://127.0.0.1:5000/api/overview"+this.showing)
               .then( function(Response) {
                 this.chart.data = Response.data.dates;
                 this.series.dataFields.valueY = this.showing;
@@ -232,13 +248,13 @@
             "change_page": function change_page(page) {
                 this.currentPage = page;
             },
-            "shown": function(country_id) {
+            "shown": function shown(country_id) {
                 this.Shown[country_id] = !this.Shown[country_id];
                 console.log(this.Shown[country_id]);
                 // console.log(HelloWorld.computed.get_general());
                 this.$root.$emit('shown', this.Shown);
             },
-            "datashown": function(data_to_show) {
+            "datashown": function datashown(data_to_show) {
               this.Data_Showing[data_to_show] = !this.Data_Showing[data_to_show];
               this.showing = data_to_show;
               // this.Data_Showing["累计确诊"] = false;
@@ -249,6 +265,36 @@
               }.bind(this));
               this.$root.$emit('datashowing', data_to_show);
               this.update_overview();
+            },
+            "refresh": function refresh() {
+              var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
+              var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
+              console.log(from+to);
+              axios.get("http://127.0.0.1:5000/api/countries_?from="+from+"&to="+to)
+                .then( function(Response) {
+                  this.rows = Response.data.countries;
+                  this.realrows = [...this.rows]
+                  // var temp = [this.rows]
+                  // console.log(Response.data.countries);
+                  this.$root.$emit('date_updated', [...this.rows]);
+                }.bind(this));
+              // console.log("Refresh!");
+            },
+            "filter": function filter(Shown) {
+              var temp = [...this.realrows];
+              this.realrows.forEach(function(cou, ind){
+                if(!Shown[cou.id]){
+                  // console.log(cou.id);
+                  if(temp.indexOf(cou)  > -1)
+                    temp.splice(temp.indexOf(cou), 1);
+                }
+                // if(this.records[cou.id])
+                //   this.records[cou.id].isActive = this.Shown[cou.id];
+              }.bind(this));
+              this.rows = temp;
+            },
+            "clear": function clear() {
+              this.rows = [...this.realrows];
             }
         },
         watch: {

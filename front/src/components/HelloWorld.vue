@@ -5,23 +5,9 @@
 
   <div id="chartdiv"></div>
 <!-- <div id="chartdiv"></div> -->
-<div id="list">
-<div id="items">
-<table id="areas" class="compact hover order-column row-border">
-<thead>
-<tr>
-<th>Country/State</th>
-<th>Confirmed</th>
-<th>Deaths</th>
-<th>Recovered</th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
-</div>
-</div>
-
+  <button v-on:click="dataShown()">Filter</button>
+  <button v-on:click="clear()">Clear</button>
+  <button v-on:click="showchart()">Show Chart</button>
 
 
 
@@ -58,6 +44,10 @@ export default {
   data(){
     return {
       MapData: [1, 2, 3],
+      Shown: {},
+      records: {},
+      realdata: null,
+      bubbleSeriess: null
     }
   },
   mounted(){
@@ -73,12 +63,16 @@ export default {
     var bubbleSeries;
     var polygonSeries;
 
-    axios.get("http://127.0.0.1:5000//api/countries_")
+    axios.get("http://127.0.0.1:5000/api/countries_")
       .then( function(Response) {
         var mapData = Response.data.countries;
-        console.log(this.MapData);
+        this.realdata = [...mapData];
+        mapData.forEach(function(cou){
+          this.Shown[cou.id] = false;
+        }.bind(this));
+        // console.log(this.MapData);
         this.MapData = [...Response.data.countries];
-        console.log(mapData);
+        // console.log(mapData);
 
         var container  = am4core.create("chartdiv", am4core.Container);
         // container.wheelable = false;
@@ -102,8 +96,16 @@ export default {
         polygonSeries = map.series.push(new am4maps.MapPolygonSeries());
         polygonSeries.useGeodata = true
         polygonSeries.mapPolygons.template.events.on("hit", function(ev) {
-          map.zoomToMapObject(ev.target)
-        })
+          // map.zoomToMapObject(ev.target)
+          // console.log(ev.target);
+          // if(!ev.target.isActive)
+          this.Shown[ev.target.dataItem.dataContext.id] = !ev.target.isActive;
+          this.records[ev.target.dataItem.dataContext.id] = ev.target;
+          // console.log(this.Shown);
+          // console.log(ev.target.isActive);
+          // ev.target.isActive = !ev.target.isActive;
+          // console.log(ev.target.dataItem.dataContext.id);
+        }.bind(this));
         map.backgroundSeries.mapPolygons.template.polygon.fillOpacity = 0.05;
         map.backgroundSeries.mapPolygons.template.polygon.fill = am4core.color("#ffffff");
         map.backgroundSeries.hidden = true;
@@ -128,7 +130,7 @@ export default {
         polygonSeries.strokeWidth = 0.5;
         // this helps to place bubbles in the visual middle of the area
         polygonSeries.calculateVisualCenter = true;
-        polygonSeries.data = mapData;
+        polygonSeries.data = JSON.parse(JSON.stringify(mapData));
 
         var polygonTemplate = polygonSeries.mapPolygons.template;
         polygonTemplate.fill = countryColor;
@@ -155,13 +157,30 @@ export default {
         // polygon states
         var polygonHoverState = polygonTemplate.states.create("hover");
         polygonHoverState.transitionDuration = 1400;
-        polygonHoverState.properties.fill = countryHoverColor;
+        polygonHoverState.properties.fill = map.colors.getIndex(25);
+        // polygonHoverState.properties.fill = map.colors.getIndex(20);
 
-        var polygonActiveState = polygonTemplate.states.create("active")
-        polygonActiveState.properties.fill = activeCountryColor;
+        var activeState = polygonTemplate.states.create("active");
+        activeState.properties.fill = map.colors.getIndex(30);
+
+        polygonTemplate.events.on("hit", function(ev) {
+          ev.target.isActive = !ev.target.isActive;
+        })
+
+
+        polygonSeries.heatRules.push({
+          property: "fill",
+          target: polygonSeries.mapPolygons.template,
+          min: map.colors.getIndex(8).brighten(2),
+          max: map.colors.getIndex(8).brighten(-10)
+        });
+
+        // var polygonActiveState = polygonTemplate.states.create("active")
+        // polygonActiveState.properties.fill = activeCountryColor;
 
         // Bubble series
         bubbleSeries = map.series.push(new am4maps.MapImageSeries());
+        this.bubbleSeriess = bubbleSeries;
         bubbleSeries.data = JSON.parse(JSON.stringify(mapData));
 
         bubbleSeries.dataFields.value = "累计确诊";
@@ -196,6 +215,7 @@ export default {
         // When hovered, circles become non-opaque  
         var imageHoverState = imageTemplate.states.create("hover");
         imageHoverState.properties.fillOpacity = 1;
+        imageHoverState.properties.fill = map.colors.getIndex(45);
 
         // add circle inside the image
         var circle = imageTemplate.createChild(am4core.Circle);
@@ -261,7 +281,7 @@ export default {
     button.events.on("toggled", function(event) {
       if (event.target.isActive) {
         console.log("asda");
-        axios.get("http://127.0.0.1:5000//api/countries_2020")
+        axios.get("http://127.0.0.1:5000/api/countries_2020")
           .then((Response) => {
               bubbleSeries.dataItems.each(function(dataItem) {
                 console.log(dataItem.dataContext.name, dataItem.dataContext.累计确诊);
@@ -306,10 +326,18 @@ export default {
     }.bind(this));
 
 
+    this.$root.$on('date_updated', function(new_data) {
+      console.log("sadasd!!!");
+      console.log(new_data);
+      this.realdata = [...new_data];
+      polygonSeries.data = JSON.parse(JSON.stringify(new_data));
+      bubbleSeries.data = JSON.parse(JSON.stringify(new_data));
+      this.MapData = new_data;
+    }.bind(this));
 
     async function redraw(Shown, data){
       console.log(Object.keys(Shown).length);
-      // console.log(this.MapData);
+      console.log(data);
       var temp = [...data];
       data.forEach(function(cou, ind){
         if(!Shown[cou.id]){
@@ -318,6 +346,7 @@ export default {
             temp.splice(temp.indexOf(cou), 1);
         }
       });
+      this.realdata = [...temp];
       bubbleSeries.data = temp;
       // func("Done!");
       return "Done!";
@@ -327,7 +356,7 @@ export default {
 
   methods: {
     "get_data": function get_data(type, func){
-      axios.get("http://127.0.0.1:5000//api/countries_")
+      axios.get("http://127.0.0.1:5000/api/countries_")
         .then((Response) => {
           // var mapData = Response.data.countries;
           console.log(Response.data);
@@ -337,6 +366,61 @@ export default {
     },
     "test": function test(type){
       return type;
+    },
+    "dataShown": function dataShown() {
+      console.log(this.Shown);
+      var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
+      var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
+      console.log(from+to);
+      var temp = [...this.realdata];
+      this.realdata.forEach(function(cou, ind){
+        if(!this.Shown[cou.id]){
+          // console.log(cou.id);
+          if(temp.indexOf(cou)  > -1)
+            temp.splice(temp.indexOf(cou), 1);
+        }
+        if(this.records[cou.id])
+          this.records[cou.id].isActive = this.Shown[cou.id];
+      }.bind(this));
+      // this.realdata = [...temp];
+      this.bubbleSeriess.data = temp;
+      this.$root.$emit('filter', this.Shown);
+      // axios.get("http://127.0.0.1:5000/api/countries_")
+      //   .then( function(Response) {
+      //   });
+    },
+    "clear": function clear() {
+      this.realdata.forEach(function(cou){
+        this.Shown[cou.id] = false;
+      }.bind(this));
+      this.dataShown();
+      this.$root.$emit('clear');
+    },
+    "showchart": function showchart() {
+      console.log("Show Chart!");
+      var countries = {};
+      var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
+      var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
+      Object.keys(this.Shown).forEach(function(cou){
+        if(this.Shown[cou]){
+          countries[cou] = [];
+        }
+      }.bind(this));
+      console.log(countries);
+      var couL = "";
+       Object.keys(countries).forEach(function(cou){
+        couL += cou+",";
+      });
+      couL = couL.slice(0, couL.length-1);
+      console.log(couL);
+      if(couL!="")
+        axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL)
+          .then( function(Response) {
+          });
+      // cou = [...countries];
+      // cou.forEach(function(cc, index){
+
+      // });
     }
   },
 

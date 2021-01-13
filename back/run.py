@@ -78,9 +78,15 @@ def random_number():
 
 @app.route('/api/countries<string:type>')
 def countries(type):
-    # print(type)
+    print(request.args.get("from"))
+    print(request.args.get("to"))
+    if request.args.get("from") == None:
+        sql = "select  国家地区, sum(新增确诊) as 新增确诊, sum(新增死亡) as 新增死亡, sum(重症病例) as 重症病例, max(累计确诊) as 累计确诊, max(累计治愈) as 累计治愈,  sum(仍在治疗) as 仍在治疗, max(累计死亡) as 累计死亡 from  yiqing group by 国家地区 order by 国家地区"
+    else:
+        sql = "select  国家地区, sum(新增确诊) as 新增确诊, sum(新增死亡) as 新增死亡, sum(重症病例) as 重症病例, max(累计确诊) as 累计确诊, max(累计治愈) as 累计治愈,  sum(仍在治疗) as 仍在治疗, max(累计死亡) as 累计死亡 from  yiqing where 日期>='"+request.args.get("from")+"' and 日期<='"+request.args.get("to")+"' group by 国家地区 order by 国家地区"
+        print(sql)
+    # print("asdasdasd")
     # sql = "select  国家地区, max(累计确诊) as 累计确诊, sum(新增确诊) as 新增确诊, max(累计死亡) as 累计死亡, sum(新增死亡) as 新增死亡, max(累计治愈) as 累计治愈, sum(仍在治疗) as 仍在治疗, sum(重症病例) as 重症病例 from  yiqing group by 国家地区;"
-    sql = "select  国家地区, sum(新增确诊) as 新增确诊, sum(新增死亡) as 新增死亡, sum(重症病例) as 重症病例, max(累计确诊) as 累计确诊, max(累计治愈) as 累计治愈,  sum(仍在治疗) as 仍在治疗, max(累计死亡) as 累计死亡 from  yiqing group by 国家地区 order by 国家地区"
     # if 
     countries = SQL_advanced(db, sql)
     sql = '''select t.国家地区, t.日期, t.仍在治疗
@@ -112,6 +118,22 @@ def countries(type):
     return jsonify(response)
 
 # 新增确诊 新增死亡 重症病例 累计确诊 累计治愈 仍在治疗 累计死亡 
+
+@app.route('/api/countriesL')
+def countriesL():
+    fromD = request.args.get("from")
+    toD = request.args.get("to")
+    couL = request.args.get("countries").split(",")
+    # for cou in request.args:
+    #     counts.append(cou[0])
+    print(fromD, toD, couL)
+    response = {
+        "countries": "sadsad"
+    }
+
+    return jsonify(response)
+
+
 
 @app.route('/api/overview<string:type>')
 def overview(type):
