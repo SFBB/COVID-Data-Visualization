@@ -273,10 +273,11 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
               axios.get("http://127.0.0.1:5000/api/countries_?from="+from+"&to="+to)
                 .then( function(Response) {
                   this.rows = Response.data.countries;
-                  this.realrows = [...this.rows]
+                  this.realrows = [...this.rows];
+                  var temp = [...this.rows];
                   // var temp = [this.rows]
                   // console.log(Response.data.countries);
-                  this.$root.$emit('date_updated', [...this.rows]);
+                  this.$root.$emit('date_updated', temp, this.Shown);
                 }.bind(this));
               // console.log("Refresh!");
             },

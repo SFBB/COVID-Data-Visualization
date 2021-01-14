@@ -216,7 +216,7 @@ export default {
           property: "fill",
           target: polygonSeries.mapPolygons.template,
           min: map.colors.getIndex(8).brighten(2),
-          max: map.colors.getIndex(8).brighten(-10)
+          max: map.colors.getIndex(8).brighten(-0.5)
         });
 
         // var polygonActiveState = polygonTemplate.states.create("active")
@@ -343,10 +343,12 @@ export default {
     this.$root.$on('shown', function(Shown) {
       
       // bubbleSeries.data = temp;
+      console.log(this.MapData.length);
       (async function() {
-        const dogs = await redraw(Shown, this.MapData);
+        const dogs = await reDraw(Shown, this.MapData);
         // console.log(dogs)
       }.bind(this))()
+      console.log(this.MapData.length);
       
       // console.log("Received!");
       // console.log(temp);
@@ -359,7 +361,7 @@ export default {
       this.showing = data_to_show;
       bubbleSeries.dataFields.value = data_to_show;
       polygonSeries.dataFields.value = data_to_show;
-      this.MapData = [...this.realdata];
+      // this.MapData = [...this.realdata];
       polygonSeries.data = JSON.parse(JSON.stringify(this.MapData));
       bubbleSeries.data = JSON.parse(JSON.stringify(this.MapData));
       // // bubbleSeries.data = temp;
@@ -374,20 +376,29 @@ export default {
     }.bind(this));
 
 
-    this.$root.$on('date_updated', function(new_data) {
+    this.$root.$on('date_updated', function(new_data, Shown) {
       console.log("sadasd!!!");
       // console.log(new_data);
       this.realdata = [...new_data];
-      polygonSeries.data = JSON.parse(JSON.stringify(new_data));
-      bubbleSeries.data = JSON.parse(JSON.stringify(new_data));
+      // polygonSeries.data = JSON.parse(JSON.stringify(new_data));
+      // bubbleSeries.data = JSON.parse(JSON.stringify(new_data));
       this.MapData = new_data;
+      console.log(new_data);
+      (async function() {
+        console.log(this.MapData);
+        const dogs = await reDraw(Shown, this.MapData);
+        // console.log(dogs)
+      }.bind(this))()
     }.bind(this));
 
     async function redraw(Shown, data){
+      // console.log(Shown);
       // console.log(Object.keys(Shown).length);
       // console.log(data);
       var temp = [...data];
+      // console.log(temp);
       data.forEach(function(cou, ind){
+        // console.log(Shown[cou.id]);
         if(!Shown[cou.id]){
           // console.log(cou.id);
           if(temp.indexOf(cou)  > -1)
@@ -395,10 +406,16 @@ export default {
         }
       });
       // this.realdata = [...temp];
-      bubbleSeries.data = temp;
+      data = temp;
+      this.MapData = temp;
+      // console.log(data);
+      polygonSeries.data = JSON.parse(JSON.stringify(this.MapData));
+      bubbleSeries.data = JSON.parse(JSON.stringify(this.MapData));
       // func("Done!");
       return "Done!";
     }
+
+    let reDraw = redraw.bind(this);
 
   },
 
@@ -469,7 +486,7 @@ export default {
       var showingg = this.showing;
       if(couL!="")
       {
-        console.log(this.show);
+        // console.log(this.show);
         this.show = true;
         axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL+"&type="+this.showing)
           .then( function(Response) {
@@ -502,7 +519,7 @@ export default {
               });
             }
 
-            console.log(data);
+            // console.log(data);
 
 
 
