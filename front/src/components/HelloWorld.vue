@@ -437,8 +437,8 @@ export default {
       var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
       var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
       // console.log(from+to);
-      var temp = [...this.realdata];
-      this.realdata.forEach(function(cou, ind){
+      var temp = [...this.MapData];
+      this.MapData.forEach(function(cou, ind){
         if(!this.Shown[cou.id] && condition){
           // console.log(cou.id);
           if(temp.indexOf(cou)  > -1)
