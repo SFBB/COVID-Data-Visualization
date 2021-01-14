@@ -180,8 +180,8 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
 
                 chart.language.setTranslationAny("%1Y", "%1A");
                 chart.language.setTranslationAny("%1M", "%1M");
-                chart.language.setTranslationAny("YTD", "ESTE AÑO");
-                chart.language.setTranslationAny("MAX", "TODO");
+                chart.language.setTranslationAny("YTD", "This Year");
+                chart.language.setTranslationAny("MAX", "Home");
               }.bind(this));
 
 
