@@ -359,6 +359,9 @@ export default {
       this.showing = data_to_show;
       bubbleSeries.dataFields.value = data_to_show;
       polygonSeries.dataFields.value = data_to_show;
+      this.MapData = [...this.realdata];
+      polygonSeries.data = JSON.parse(JSON.stringify(this.MapData));
+      bubbleSeries.data = JSON.parse(JSON.stringify(this.MapData));
       // // bubbleSeries.data = temp;
       // (async function() {
       //   const dogs = await redraw(Shown, this.MapData);
@@ -428,6 +431,7 @@ export default {
           this.records[cou.id].isActive = this.Shown[cou.id];
       }.bind(this));
       // this.realdata = [...temp];
+      console.log(temp.length);
       this.bubbleSeriess.data = JSON.parse(JSON.stringify(temp));
       this.$root.$emit('filter', this.Shown);
       // axios.get("http://127.0.0.1:5000/api/countries_")
@@ -439,14 +443,13 @@ export default {
       // console.log(this.Shown);
       this.realdata.forEach(function(cou){
         // console.log(cou.id);
-        this.Shown[cou.id] = false;
+        this.Shown[cou.id] = true;
       }.bind(this));
       this.dataShown();
       this.$root.$emit('clear');
     },
     "showchart": function showchart() {
-      this.show = true;
-
+      
       console.log("Show Chart!");
       var countries = {};
       var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
@@ -459,12 +462,14 @@ export default {
       console.log(countries);
       var couL = "";
        Object.keys(countries).forEach(function(cou){
-        couL += cou+",";
+         couL += cou+",";
       });
       couL = couL.slice(0, couL.length-1);
       // console.log(couL);
       var showingg = this.showing;
       if(couL!="")
+      {
+        this.show = true;
         axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL+"&type="+this.showing)
           .then( function(Response) {
             // console.log(Response.data.countries);
@@ -538,6 +543,9 @@ export default {
                   chart.legend = new am4charts.Legend();
                   chart.cursor = new am4charts.XYCursor();
           });
+      }
+      else
+        alert("Please select at least one country!");
       // cou = [...countries];
       // cou.forEach(function(cc, index){
 
