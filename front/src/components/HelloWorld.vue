@@ -45,7 +45,7 @@
 
 
 <!-- <div id="chartdiv"></div> -->
-  <button class="btn btn-info" v-on:click="dataShown()">Filter</button>
+  <button class="btn btn-info" v-on:click="dataShown(true)">Filter</button>
   <button class="btn btn-danger" v-on:click="clear()">Clear</button>
   <button class="btn btn-warning" v-on:click="showchart()">Show Chart</button>
 
@@ -141,8 +141,8 @@ export default {
         polygonSeries.useGeodata = true
         polygonSeries.mapPolygons.template.events.on("hit", function(ev) {
           // map.zoomToMapObject(ev.target)
-          // console.log(ev.target);
-          // if(!ev.target.isActive)
+          console.log(ev.target.isActive);
+          // if(ev.target.isActive)
           this.Shown[ev.target.dataItem.dataContext.id] = !ev.target.isActive;
           this.records[ev.target.dataItem.dataContext.id] = ev.target;
           // console.log(this.Shown);
@@ -415,14 +415,14 @@ export default {
     "test": function test(type){
       return type;
     },
-    "dataShown": function dataShown() {
+    "dataShown": function dataShown(condition) {
       // console.log(this.Shown);
       var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
       var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
       // console.log(from+to);
       var temp = [...this.realdata];
       this.realdata.forEach(function(cou, ind){
-        if(!this.Shown[cou.id]){
+        if(!this.Shown[cou.id] && condition){
           // console.log(cou.id);
           if(temp.indexOf(cou)  > -1)
             temp.splice(temp.indexOf(cou), 1);
@@ -443,9 +443,9 @@ export default {
       // console.log(this.Shown);
       this.realdata.forEach(function(cou){
         // console.log(cou.id);
-        this.Shown[cou.id] = true;
+        this.Shown[cou.id] = false;
       }.bind(this));
-      this.dataShown();
+      this.dataShown(false);
       this.$root.$emit('clear');
     },
     "showchart": function showchart() {
