@@ -45,9 +45,9 @@
 
 
 <!-- <div id="chartdiv"></div> -->
-  <button v-on:click="dataShown()">Filter</button>
-  <button v-on:click="clear()">Clear</button>
-  <button v-on:click="showchart()">Show Chart</button>
+  <button class="btn btn-info" v-on:click="dataShown()">Filter</button>
+  <button class="btn btn-danger" v-on:click="clear()">Clear</button>
+  <button class="btn btn-warning" v-on:click="showchart()">Show Chart</button>
 
 
 

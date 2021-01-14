@@ -5,7 +5,7 @@
     </div>
     <div id="selectordiv">
     </div>
-    <button v-on:click="refresh()">Invalidate</button>
+    <button class="btn btn-success" v-on:click="refresh()">Invalidate</button>
    <table>
      <thead>
        <tr>
