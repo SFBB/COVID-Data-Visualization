@@ -12,7 +12,7 @@ import datetime, time
 
 def connect_db(name):
     try:
-        con = psycopg2.connect(database=name, user="postgres", password="4869221B", host="127.0.0.1", port="5432")
+        con = psycopg2.connect(database=name, user="username", password="password", host="127.0.0.1", port="5432")
         con.autocommit = True
 
         # sqliteConnection = sqlite3.connect(name)
