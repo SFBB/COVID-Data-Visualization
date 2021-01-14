@@ -9,13 +9,13 @@
 
   <!-- Modal -->
   <transition name="fade">
-    <div class="modal" v-if="show">
-      <div class="modal__backdrop" v-on:click="closeChart()"/>
+    <div class="modallll" v-if="show">
+      <div class="modallll__backdrop" v-on:click="closeChart()"/>
 
-      <div class="modal__dialog">
-        <div class="modal__header">
+      <div class="modallll__dialog">
+        <div class="modallll__header">
           <h1 id="keys_title">{{showing}}</h1>
-          <button type="button" class="modal__close" v-on:click="closeChart()">
+          <button type="button" class="modallll__close" v-on:click="closeChart()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
               <path
                 fill="currentColor"
@@ -25,11 +25,11 @@
           </button>
         </div>
 
-        <div class="modal__body">
+        <div class="modallll__body">
           <div id="DetailsChart"></div>
         </div>
 
-        <div class="modal__footer">
+        <div class="modallll__footer">
           <select id="keys" v-on:change="changeChart()">
             <option v-for="(key) in keys" :key="key" :value="key">{{key}}</option>
           </select>
@@ -469,6 +469,7 @@ export default {
       var showingg = this.showing;
       if(couL!="")
       {
+        console.log(this.show);
         this.show = true;
         axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL+"&type="+this.showing)
           .then( function(Response) {
@@ -501,7 +502,7 @@ export default {
               });
             }
 
-            // console.log(data);
+            console.log(data);
 
 
 
@@ -784,7 +785,7 @@ table tbody tr:nth-child(2n) td {
   width: 100%;
   height: 500px;
 }
-.modal {
+.modallll {
   position: fixed;
   top: 0;
   right: 0;
