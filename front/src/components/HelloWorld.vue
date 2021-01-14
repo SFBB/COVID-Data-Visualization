@@ -9,13 +9,13 @@
 
   <!-- Modal -->
   <transition name="fade">
-    <div class="modal" v-if="show">
-      <div class="modal__backdrop" v-on:click="closeChart()"/>
+    <div class="modallll" v-if="show">
+      <div class="modallll__backdrop" v-on:click="closeChart()"/>
 
-      <div class="modal__dialog">
-        <div class="modal__header">
+      <div class="modallll__dialog">
+        <div class="modallll__header">
           <h1 id="keys_title">{{showing}}</h1>
-          <button type="button" class="modal__close" v-on:click="closeChart()">
+          <button type="button" class="modallll__close" v-on:click="closeChart()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
               <path
                 fill="currentColor"
@@ -25,11 +25,11 @@
           </button>
         </div>
 
-        <div class="modal__body">
+        <div class="modallll__body">
           <div id="DetailsChart"></div>
         </div>
 
-        <div class="modal__footer">
+        <div class="modallll__footer">
           <select id="keys" v-on:change="changeChart()">
             <option v-for="(key) in keys" :key="key" :value="key">{{key}}</option>
           </select>
@@ -45,7 +45,7 @@
 
 
 <!-- <div id="chartdiv"></div> -->
-  <button class="btn btn-info" v-on:click="dataShown()">Filter</button>
+  <button class="btn btn-info" v-on:click="dataShown(true)">Filter</button>
   <button class="btn btn-danger" v-on:click="clear()">Clear</button>
   <button class="btn btn-warning" v-on:click="showchart()">Show Chart</button>
 
@@ -141,8 +141,8 @@ export default {
         polygonSeries.useGeodata = true
         polygonSeries.mapPolygons.template.events.on("hit", function(ev) {
           // map.zoomToMapObject(ev.target)
-          // console.log(ev.target);
-          // if(!ev.target.isActive)
+          console.log(ev.target.isActive);
+          // if(ev.target.isActive)
           this.Shown[ev.target.dataItem.dataContext.id] = !ev.target.isActive;
           this.records[ev.target.dataItem.dataContext.id] = ev.target;
           // console.log(this.Shown);
@@ -216,7 +216,7 @@ export default {
           property: "fill",
           target: polygonSeries.mapPolygons.template,
           min: map.colors.getIndex(8).brighten(2),
-          max: map.colors.getIndex(8).brighten(-10)
+          max: map.colors.getIndex(8).brighten(-0.5)
         });
 
         // var polygonActiveState = polygonTemplate.states.create("active")
@@ -343,10 +343,12 @@ export default {
     this.$root.$on('shown', function(Shown) {
       
       // bubbleSeries.data = temp;
+      console.log(this.MapData.length);
       (async function() {
-        const dogs = await redraw(Shown, this.MapData);
+        const dogs = await reDraw(Shown, this.MapData);
         // console.log(dogs)
       }.bind(this))()
+      console.log(this.MapData.length);
       
       // console.log("Received!");
       // console.log(temp);
@@ -359,7 +361,7 @@ export default {
       this.showing = data_to_show;
       bubbleSeries.dataFields.value = data_to_show;
       polygonSeries.dataFields.value = data_to_show;
-      this.MapData = [...this.realdata];
+      // this.MapData = [...this.realdata];
       polygonSeries.data = JSON.parse(JSON.stringify(this.MapData));
       bubbleSeries.data = JSON.parse(JSON.stringify(this.MapData));
       // // bubbleSeries.data = temp;
@@ -374,31 +376,46 @@ export default {
     }.bind(this));
 
 
-    this.$root.$on('date_updated', function(new_data) {
+    this.$root.$on('date_updated', function(new_data, Shown) {
       console.log("sadasd!!!");
       // console.log(new_data);
       this.realdata = [...new_data];
-      polygonSeries.data = JSON.parse(JSON.stringify(new_data));
-      bubbleSeries.data = JSON.parse(JSON.stringify(new_data));
+      // polygonSeries.data = JSON.parse(JSON.stringify(new_data));
+      // bubbleSeries.data = JSON.parse(JSON.stringify(new_data));
       this.MapData = new_data;
+      console.log(new_data);
+      (async function() {
+        console.log(this.MapData);
+        const dogs = await reDraw(Shown, this.MapData);
+        // console.log(dogs)
+      }.bind(this))()
     }.bind(this));
 
     async function redraw(Shown, data){
+      // console.log(Shown);
       // console.log(Object.keys(Shown).length);
       // console.log(data);
       var temp = [...data];
+      // console.log(temp);
       data.forEach(function(cou, ind){
+        // console.log(Shown[cou.id]);
         if(!Shown[cou.id]){
           // console.log(cou.id);
           if(temp.indexOf(cou)  > -1)
             temp.splice(temp.indexOf(cou), 1);
         }
       });
-      this.realdata = [...temp];
-      bubbleSeries.data = temp;
+      // this.realdata = [...temp];
+      data = temp;
+      this.MapData = temp;
+      // console.log(data);
+      polygonSeries.data = JSON.parse(JSON.stringify(this.MapData));
+      bubbleSeries.data = JSON.parse(JSON.stringify(this.MapData));
       // func("Done!");
       return "Done!";
     }
+
+    let reDraw = redraw.bind(this);
 
   },
 
@@ -415,14 +432,14 @@ export default {
     "test": function test(type){
       return type;
     },
-    "dataShown": function dataShown() {
+    "dataShown": function dataShown(condition) {
       // console.log(this.Shown);
       var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
       var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
       // console.log(from+to);
       var temp = [...this.realdata];
       this.realdata.forEach(function(cou, ind){
-        if(!this.Shown[cou.id]){
+        if(!this.Shown[cou.id] && condition){
           // console.log(cou.id);
           if(temp.indexOf(cou)  > -1)
             temp.splice(temp.indexOf(cou), 1);
@@ -443,9 +460,9 @@ export default {
       // console.log(this.Shown);
       this.realdata.forEach(function(cou){
         // console.log(cou.id);
-        this.Shown[cou.id] = true;
+        this.Shown[cou.id] = false;
       }.bind(this));
-      this.dataShown();
+      this.dataShown(false);
       this.$root.$emit('clear');
     },
     "showchart": function showchart() {
@@ -469,6 +486,7 @@ export default {
       var showingg = this.showing;
       if(couL!="")
       {
+        // console.log(this.show);
         this.show = true;
         axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL+"&type="+this.showing)
           .then( function(Response) {
@@ -784,7 +802,7 @@ table tbody tr:nth-child(2n) td {
   width: 100%;
   height: 500px;
 }
-.modal {
+.modallll {
   position: fixed;
   top: 0;
   right: 0;
