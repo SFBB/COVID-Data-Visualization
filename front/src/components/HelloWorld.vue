@@ -394,7 +394,7 @@ export default {
             temp.splice(temp.indexOf(cou), 1);
         }
       });
-      this.realdata = [...temp];
+      // this.realdata = [...temp];
       bubbleSeries.data = temp;
       // func("Done!");
       return "Done!";
