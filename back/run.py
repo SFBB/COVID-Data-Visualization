@@ -122,7 +122,7 @@ def countries(type):
     # print(response)
     return jsonify(response)
 
-# 新增确诊 新增死亡 重症病例 累计确诊 累计治愈 仍在治疗 累计死亡 
+# 新增确诊 新增死亡 重症病例 累计确诊 累计治愈 仍在治疗 累计死亡
 
 @app.route('/api/countriesL')
 def countriesL():
