@@ -345,17 +345,17 @@ export default {
       // bubbleSeries.data = temp;
       (async function() {
         const dogs = await redraw(Shown, this.MapData);
-        console.log(dogs)
+        // console.log(dogs)
       }.bind(this))()
       
-      console.log("Received!");
+      // console.log("Received!");
       // console.log(temp);
 
     }.bind(this));
 
     this.$root.$on('datashowing', function(data_to_show) {
       
-      console.log(data_to_show);
+      // console.log(data_to_show);
       this.showing = data_to_show;
       bubbleSeries.dataFields.value = data_to_show;
       polygonSeries.dataFields.value = data_to_show;
@@ -376,7 +376,7 @@ export default {
 
     this.$root.$on('date_updated', function(new_data) {
       console.log("sadasd!!!");
-      console.log(new_data);
+      // console.log(new_data);
       this.realdata = [...new_data];
       polygonSeries.data = JSON.parse(JSON.stringify(new_data));
       bubbleSeries.data = JSON.parse(JSON.stringify(new_data));
@@ -384,12 +384,12 @@ export default {
     }.bind(this));
 
     async function redraw(Shown, data){
-      console.log(Object.keys(Shown).length);
-      console.log(data);
+      // console.log(Object.keys(Shown).length);
+      // console.log(data);
       var temp = [...data];
       data.forEach(function(cou, ind){
         if(!Shown[cou.id]){
-          console.log(cou.id);
+          // console.log(cou.id);
           if(temp.indexOf(cou)  > -1)
             temp.splice(temp.indexOf(cou), 1);
         }
@@ -407,7 +407,7 @@ export default {
       axios.get("http://127.0.0.1:5000/api/countries_")
         .then((Response) => {
           // var mapData = Response.data.countries;
-          console.log(Response.data);
+          // console.log(Response.data);
           func(Response.data.countries);
           // this.MapData = Response.data.countries;
         });
@@ -416,10 +416,10 @@ export default {
       return type;
     },
     "dataShown": function dataShown() {
-      console.log(this.Shown);
+      // console.log(this.Shown);
       var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
       var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
-      console.log(from+to);
+      // console.log(from+to);
       var temp = [...this.realdata];
       this.realdata.forEach(function(cou, ind){
         if(!this.Shown[cou.id]){
@@ -431,7 +431,7 @@ export default {
           this.records[cou.id].isActive = this.Shown[cou.id];
       }.bind(this));
       // this.realdata = [...temp];
-      console.log(temp.length);
+      // console.log(temp.length);
       this.bubbleSeriess.data = JSON.parse(JSON.stringify(temp));
       this.$root.$emit('filter', this.Shown);
       // axios.get("http://127.0.0.1:5000/api/countries_")
@@ -450,7 +450,7 @@ export default {
     },
     "showchart": function showchart() {
       
-      console.log("Show Chart!");
+      // console.log("Show Chart!");
       var countries = {};
       var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
       var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
@@ -459,7 +459,7 @@ export default {
           countries[cou] = [];
         }
       }.bind(this));
-      console.log(countries);
+      // console.log(countries);
       var couL = "";
        Object.keys(countries).forEach(function(cou){
          couL += cou+",";
@@ -555,7 +555,7 @@ export default {
       this.show = false;
     },
     "changeChart": function changeChart() {
-      console.log("Change!");
+      // console.log("Change!");
       // console.log(document.getElementById("keys").value);
       var showing = document.getElementById("keys").value;
       document.getElementById("keys_title").innerText = document.getElementById("keys").value;
@@ -594,13 +594,13 @@ export default {
             });
             for(var i=1; i<Object.keys(Response.data.countries).length; i++){
               var values = Response.data.countries[Object.keys(Response.data.countries)[i]];
-              console.log(values);
+              // console.log(values);
               var indexes = values.map(obj => obj.date);
               data = data.map(obj => {
                 var index = indexes.indexOf(obj.date);
                 var cou = Object.keys(Response.data.countries)[i];
                 // var b = {: index > -1? values[index].新增确诊 : obj.新增确诊};
-                console.log(obj);
+                // console.log(obj);
                 var temp = {};
                 temp[Object.keys(Response.data.countries)[i]] = index > -1? values[index][showingg] : obj[showingg];
                 return Object.assign({}, obj, temp);
@@ -654,7 +654,7 @@ export default {
 
   computed: {
     "get_MapData": function get_MapData(){
-      console.log(this.MapData);
+      // console.log(this.MapData);
       return this.MapData;
     },
     "keys": function keys() {

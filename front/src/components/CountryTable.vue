@@ -202,7 +202,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
             }.bind(this));
 
             this.$root.$on('filter', function(Shown) {
-              console.log("Filter!");
+              // console.log("Filter!");
               this.filter(Shown);
             }.bind(this));
 
@@ -250,7 +250,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
             },
             "shown": function shown(country_id) {
                 this.Shown[country_id] = !this.Shown[country_id];
-                console.log(this.Shown[country_id]);
+                // console.log(this.Shown[country_id]);
                 // console.log(HelloWorld.computed.get_general());
                 this.$root.$emit('shown', this.Shown);
             },
@@ -269,7 +269,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
             "refresh": function refresh() {
               var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
               var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
-              console.log(from+to);
+              // console.log(from+to);
               axios.get("http://127.0.0.1:5000/api/countries_?from="+from+"&to="+to)
                 .then( function(Response) {
                   this.rows = Response.data.countries;
@@ -292,7 +292,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
                 // if(this.records[cou.id])
                 //   this.records[cou.id].isActive = this.Shown[cou.id];
               }.bind(this));
-              console.log("sadasdasd");
+              // console.log("sadasdasd");
               this.rows = temp;
             },
             "clear": function clear() {
@@ -310,7 +310,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
                 if (this.rows.length == 0) {
                     return [];
                 }
-                console.log(Object.keys(this.rows[0]));
+                // console.log(Object.keys(this.rows[0]));
                 return Object.keys(this.rows[0]);
             },
             "datashowing": function datashowing() {
