@@ -4,20 +4,60 @@
     </div> -->
 
   <div id="chartdiv"></div>
+
+
+
+  <!-- Modal -->
+  <transition name="fade">
+    <div class="modal" v-if="show">
+      <div class="modal__backdrop" v-on:click="closeChart()"/>
+
+      <div class="modal__dialog">
+        <div class="modal__header">
+          <h1 id="keys_title">{{showing}}</h1>
+          <button type="button" class="modal__close" v-on:click="closeChart()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
+              <path
+                fill="currentColor"
+                d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal__body">
+          <div id="DetailsChart"></div>
+        </div>
+
+        <div class="modal__footer">
+          <select id="keys" v-on:change="changeChart()">
+            <option v-for="(key) in keys" :key="key" :value="key">{{key}}</option>
+          </select>
+          <!-- <button v-on:click="closeChart()">Cancel</button>
+          <button v-on:click="closeChart()">Save</button> -->
+        </div>
+        </div>
+      </div>
+  </transition>
+
+
+
+
+
 <!-- <div id="chartdiv"></div> -->
-  <button v-on:click="dataShown()">Filter</button>
-  <button v-on:click="clear()">Clear</button>
-  <button v-on:click="showchart()">Show Chart</button>
+  <button class="btn btn-info" v-on:click="dataShown()">Filter</button>
+  <button class="btn btn-danger" v-on:click="clear()">Clear</button>
+  <button class="btn btn-warning" v-on:click="showchart()">Show Chart</button>
 
 
 
-<div id="buttons"></div>
+<!-- <div id="buttons"></div> -->
 </div>
 </template>
 
 <script>
 import * as am4core from "@amcharts/amcharts4/core";
-// import * as am4charts from "@amcharts/amcharts4/charts";
+import * as am4charts from "@amcharts/amcharts4/charts";
 import * as am4maps from "@amcharts/amcharts4/maps";
 import am4geodata_worldLow from "@amcharts/amcharts4-geodata/worldLow";
 // import am4geodata_data_countries2 from "@amcharts/amcharts4-geodata/data/countries2";
@@ -28,6 +68,7 @@ import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 // import * as dt from 'datatables.net';
 import axios from "axios";
 import { fitNumberRelative } from '@amcharts/amcharts4/.internal/core/utils/Utils';
+
 
 // console.log(JSON.parse(JSON.stringify(covid_world_timeline[0].list)));
 // console.log(dt);
@@ -47,7 +88,10 @@ export default {
       Shown: {},
       records: {},
       realdata: null,
-      bubbleSeriess: null
+      bubbleSeriess: null,
+      showing: "累计确诊",
+      // keysshowing: {"新增确诊": true},
+      show: false
     }
   },
   mounted(){
@@ -277,43 +321,47 @@ export default {
 
     }.bind(this));
 
-    var button = am4core.create("buttons", am4core.PlayButton);
-    button.events.on("toggled", function(event) {
-      if (event.target.isActive) {
-        console.log("asda");
-        axios.get("http://127.0.0.1:5000/api/countries_2020")
-          .then((Response) => {
-              bubbleSeries.dataItems.each(function(dataItem) {
-                console.log(dataItem.dataContext.name, dataItem.dataContext.累计确诊);
-                dataItem.dataContext.累计确诊 = 0;
-                // dataItem.dataContext.deaths = 0;
-                // dataItem.dataContext.recovered = 0;
-                // dataItem.dataContext.active = 0;
-            })
-          });
-      } else {
-        console.log("526566");
-      }
-    });
+    // var button = am4core.create("buttons", am4core.PlayButton);
+    // button.events.on("toggled", function(event) {
+    //   if (event.target.isActive) {
+    //     console.log("asda");
+    //     axios.get("http://127.0.0.1:5000/api/countries_2020")
+    //       .then((Response) => {
+    //           bubbleSeries.dataItems.each(function(dataItem) {
+    //             console.log(dataItem.dataContext.name, dataItem.dataContext.累计确诊);
+    //             dataItem.dataContext.累计确诊 = 0;
+    //             // dataItem.dataContext.deaths = 0;
+    //             // dataItem.dataContext.recovered = 0;
+    //             // dataItem.dataContext.active = 0;
+    //         })
+    //       });
+    //   } else {
+    //     console.log("526566");
+    //   }
+    // });
 
     this.$root.$on('shown', function(Shown) {
       
       // bubbleSeries.data = temp;
       (async function() {
         const dogs = await redraw(Shown, this.MapData);
-        console.log(dogs)
+        // console.log(dogs)
       }.bind(this))()
       
-      console.log("Received!");
+      // console.log("Received!");
       // console.log(temp);
 
     }.bind(this));
 
     this.$root.$on('datashowing', function(data_to_show) {
       
-      console.log(data_to_show);
+      // console.log(data_to_show);
+      this.showing = data_to_show;
       bubbleSeries.dataFields.value = data_to_show;
       polygonSeries.dataFields.value = data_to_show;
+      this.MapData = [...this.realdata];
+      polygonSeries.data = JSON.parse(JSON.stringify(this.MapData));
+      bubbleSeries.data = JSON.parse(JSON.stringify(this.MapData));
       // // bubbleSeries.data = temp;
       // (async function() {
       //   const dogs = await redraw(Shown, this.MapData);
@@ -328,7 +376,7 @@ export default {
 
     this.$root.$on('date_updated', function(new_data) {
       console.log("sadasd!!!");
-      console.log(new_data);
+      // console.log(new_data);
       this.realdata = [...new_data];
       polygonSeries.data = JSON.parse(JSON.stringify(new_data));
       bubbleSeries.data = JSON.parse(JSON.stringify(new_data));
@@ -336,12 +384,12 @@ export default {
     }.bind(this));
 
     async function redraw(Shown, data){
-      console.log(Object.keys(Shown).length);
-      console.log(data);
+      // console.log(Object.keys(Shown).length);
+      // console.log(data);
       var temp = [...data];
       data.forEach(function(cou, ind){
         if(!Shown[cou.id]){
-          console.log(cou.id);
+          // console.log(cou.id);
           if(temp.indexOf(cou)  > -1)
             temp.splice(temp.indexOf(cou), 1);
         }
@@ -359,7 +407,7 @@ export default {
       axios.get("http://127.0.0.1:5000/api/countries_")
         .then((Response) => {
           // var mapData = Response.data.countries;
-          console.log(Response.data);
+          // console.log(Response.data);
           func(Response.data.countries);
           // this.MapData = Response.data.countries;
         });
@@ -368,10 +416,10 @@ export default {
       return type;
     },
     "dataShown": function dataShown() {
-      console.log(this.Shown);
+      // console.log(this.Shown);
       var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
       var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
-      console.log(from+to);
+      // console.log(from+to);
       var temp = [...this.realdata];
       this.realdata.forEach(function(cou, ind){
         if(!this.Shown[cou.id]){
@@ -383,21 +431,26 @@ export default {
           this.records[cou.id].isActive = this.Shown[cou.id];
       }.bind(this));
       // this.realdata = [...temp];
-      this.bubbleSeriess.data = temp;
+      // console.log(temp.length);
+      this.bubbleSeriess.data = JSON.parse(JSON.stringify(temp));
       this.$root.$emit('filter', this.Shown);
       // axios.get("http://127.0.0.1:5000/api/countries_")
       //   .then( function(Response) {
       //   });
     },
     "clear": function clear() {
+      // console.log(this.realdata);
+      // console.log(this.Shown);
       this.realdata.forEach(function(cou){
-        this.Shown[cou.id] = false;
+        // console.log(cou.id);
+        this.Shown[cou.id] = true;
       }.bind(this));
       this.dataShown();
       this.$root.$emit('clear');
     },
     "showchart": function showchart() {
-      console.log("Show Chart!");
+      
+      // console.log("Show Chart!");
       var countries = {};
       var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
       var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
@@ -406,28 +459,209 @@ export default {
           countries[cou] = [];
         }
       }.bind(this));
-      console.log(countries);
+      // console.log(countries);
+      var couL = "";
+       Object.keys(countries).forEach(function(cou){
+         couL += cou+",";
+      });
+      couL = couL.slice(0, couL.length-1);
+      // console.log(couL);
+      var showingg = this.showing;
+      if(couL!="")
+      {
+        this.show = true;
+        axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL+"&type="+this.showing)
+          .then( function(Response) {
+            // console.log(Response.data.countries);
+
+            // var count = 1;
+            // var length = countries.length;
+            // var merged;
+            // var data = [...Response.data.countries[Object.keys(Response.data.countries)[0]]];
+            var data = [];
+            // var couu = ;
+            Response.data.countries[Object.keys(Response.data.countries)[0]].forEach(function(cou, index){
+              var temp = {};
+              temp.date = cou.date;
+              temp[Object.keys(Response.data.countries)[0]] = cou[showingg];
+              data.push(temp)
+            });
+            for(var i=1; i<Object.keys(Response.data.countries).length; i++){
+              var values = Response.data.countries[Object.keys(Response.data.countries)[i]];
+              // console.log(values);
+              var indexes = values.map(obj => obj.date);
+              data = data.map(obj => {
+                var index = indexes.indexOf(obj.date);
+                var cou = Object.keys(Response.data.countries)[i];
+                // var b = {: index > -1? values[index].新增确诊 : obj.新增确诊};
+                // console.log(obj);
+                var temp = {};
+                temp[Object.keys(Response.data.countries)[i]] = index > -1? values[index][showingg] : obj[showingg];
+                return Object.assign({}, obj, temp);
+              });
+            }
+
+            // console.log(data);
+
+
+
+                  var chart = am4core.create("DetailsChart", am4charts.XYChart);
+
+                  // Add data
+                  chart.data = data;
+
+                  // Create axes
+                  var categoryAxis = chart.xAxes.push(new am4charts.DateAxis());
+                  categoryAxis.renderer.grid.template.location = 0;
+                  //categoryAxis.renderer.minGridDistance = 30;
+
+                  var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+
+                  // Create series
+                  function createSeries(field, name) {
+                    var series = chart.series.push(new am4charts.LineSeries());
+                    series.dataFields.valueY = field;
+                    series.dataFields.dateX = "date";
+                    series.name = name;
+                    series.tooltipText = "{dateX}: [b]{valueY}[/]";
+                    series.strokeWidth = 2;
+                    
+                  var bullet = series.bullets.push(new am4charts.CircleBullet());
+                  bullet.events.on("hit", function(ev) {
+                    alert("Clicked on " + ev.target.dataItem.dateX + ": " + ev.target.dataItem.valueY);
+                  });
+                  }
+
+                  var keyss = Object.keys(data[0]);
+                  for(i=1; i<keyss.length; i++){
+                    createSeries(keyss[i], keyss[i]);
+
+                  }
+                  // createSeries("value2", "Series #2");
+                  // createSeries("value3", "Series #3");
+
+                  chart.legend = new am4charts.Legend();
+                  chart.cursor = new am4charts.XYCursor();
+          });
+      }
+      else
+        alert("Please select at least one country!");
+      // cou = [...countries];
+      // cou.forEach(function(cc, index){
+
+      // });
+    },
+    "closeChart": function closeChart() {
+      this.show = false;
+    },
+    "changeChart": function changeChart() {
+      // console.log("Change!");
+      // console.log(document.getElementById("keys").value);
+      var showing = document.getElementById("keys").value;
+      document.getElementById("keys_title").innerText = document.getElementById("keys").value;
+      var countries = {};
+      var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
+      var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
+      Object.keys(this.Shown).forEach(function(cou){
+        if(this.Shown[cou]){
+          countries[cou] = [];
+        }
+      }.bind(this));
+      // console.log(countries);
       var couL = "";
        Object.keys(countries).forEach(function(cou){
         couL += cou+",";
       });
       couL = couL.slice(0, couL.length-1);
-      console.log(couL);
+      // console.log(couL);
+      var showingg = showing;
       if(couL!="")
-        axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL)
+        axios.get("http://127.0.0.1:5000/api/countriesL?from="+from+"&to="+to+"&countries="+couL+"&type="+showing)
           .then( function(Response) {
-          });
-      // cou = [...countries];
-      // cou.forEach(function(cc, index){
+            // console.log(Response.data.countries);
 
-      // });
+            // var count = 1;
+            // var length = countries.length;
+            // var merged;
+            // var data = [...Response.data.countries[Object.keys(Response.data.countries)[0]]];
+            var data = [];
+            // var couu = ;
+            Response.data.countries[Object.keys(Response.data.countries)[0]].forEach(function(cou, index){
+              var temp = {};
+              temp.date = cou.date;
+              temp[Object.keys(Response.data.countries)[0]] = cou[showingg];
+              data.push(temp)
+            });
+            for(var i=1; i<Object.keys(Response.data.countries).length; i++){
+              var values = Response.data.countries[Object.keys(Response.data.countries)[i]];
+              // console.log(values);
+              var indexes = values.map(obj => obj.date);
+              data = data.map(obj => {
+                var index = indexes.indexOf(obj.date);
+                var cou = Object.keys(Response.data.countries)[i];
+                // var b = {: index > -1? values[index].新增确诊 : obj.新增确诊};
+                // console.log(obj);
+                var temp = {};
+                temp[Object.keys(Response.data.countries)[i]] = index > -1? values[index][showingg] : obj[showingg];
+                return Object.assign({}, obj, temp);
+              });
+            }
+
+            // console.log(data);
+
+
+
+                  var chart = am4core.create("DetailsChart", am4charts.XYChart);
+
+                  // Add data
+                  chart.data = data;
+
+                  // Create axes
+                  var categoryAxis = chart.xAxes.push(new am4charts.DateAxis());
+                  categoryAxis.renderer.grid.template.location = 0;
+                  //categoryAxis.renderer.minGridDistance = 30;
+
+                  var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+
+                  // Create series
+                  function createSeries(field, name) {
+                    var series = chart.series.push(new am4charts.LineSeries());
+                    series.dataFields.valueY = field;
+                    series.dataFields.dateX = "date";
+                    series.name = name;
+                    series.tooltipText = "{dateX}: [b]{valueY}[/]";
+                    series.strokeWidth = 2;
+                    
+                  var bullet = series.bullets.push(new am4charts.CircleBullet());
+                  bullet.events.on("hit", function(ev) {
+                    alert("Clicked on " + ev.target.dataItem.dateX + ": " + ev.target.dataItem.valueY);
+                  });
+                  }
+
+                  var keyss = Object.keys(data[0]);
+                  for(i=1; i<keyss.length; i++){
+                    createSeries(keyss[i], keyss[i]);
+
+                  }
+                  // createSeries("value2", "Series #2");
+                  // createSeries("value3", "Series #3");
+
+                  chart.legend = new am4charts.Legend();
+                  chart.cursor = new am4charts.XYCursor();
+          });
     }
   },
 
   computed: {
     "get_MapData": function get_MapData(){
-      console.log(this.MapData);
+      // console.log(this.MapData);
       return this.MapData;
+    },
+    "keys": function keys() {
+      var result = ["新增确诊", "新增死亡", "重症病例", "累计确诊", "累计治愈", "仍在治疗", "累计死亡"];
+      result.splice(result.indexOf(this.showing), 1);
+      result.unshift(this.showing);
+      return result;
     }
   },
 
@@ -443,7 +677,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
 #chartdiv {
   width: 80%;
   height: 500px;
@@ -545,5 +779,73 @@ table tbody tr:nth-child(2n) td {
 }
 .number:hover, .number.active {
   background: #717699;
+}
+#DetailsChart {
+  width: 100%;
+  height: 500px;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9;
+  overflow-x: hidden;
+  overflow-y: auto;
+  &__backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+  }
+  &__dialog {
+    position: relative;
+    width: 1200px;
+    // height: 1200px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    margin: 50px auto;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    @media screen and (max-width: 992px) {
+      width: 90%;
+    }
+  }
+  &__close {
+    width: 30px;
+    height: 30px;
+  }
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 20px 10px;
+  }
+  &__body {
+    padding: 10px 20px 10px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  &__footer {
+    padding: 10px 20px 20px;
+  }
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+.overflow-hidden {
+  overflow: hidden;
 }
 </style>

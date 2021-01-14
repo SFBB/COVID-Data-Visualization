@@ -5,7 +5,7 @@
     </div>
     <div id="selectordiv">
     </div>
-    <button v-on:click="refresh()">Invalidate</button>
+    <button class="btn btn-success" v-on:click="refresh()">Invalidate</button>
    <table>
      <thead>
        <tr>
@@ -180,8 +180,8 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
 
                 chart.language.setTranslationAny("%1Y", "%1A");
                 chart.language.setTranslationAny("%1M", "%1M");
-                chart.language.setTranslationAny("YTD", "ESTE AÑO");
-                chart.language.setTranslationAny("MAX", "TODO");
+                chart.language.setTranslationAny("YTD", "This Year");
+                chart.language.setTranslationAny("MAX", "Home");
               }.bind(this));
 
 
@@ -202,7 +202,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
             }.bind(this));
 
             this.$root.$on('filter', function(Shown) {
-              console.log("Filter!");
+              // console.log("Filter!");
               this.filter(Shown);
             }.bind(this));
 
@@ -250,7 +250,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
             },
             "shown": function shown(country_id) {
                 this.Shown[country_id] = !this.Shown[country_id];
-                console.log(this.Shown[country_id]);
+                // console.log(this.Shown[country_id]);
                 // console.log(HelloWorld.computed.get_general());
                 this.$root.$emit('shown', this.Shown);
             },
@@ -269,7 +269,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
             "refresh": function refresh() {
               var from = document.getElementsByClassName("amcharts-range-selector-from-input")[0].value;
               var to = document.getElementsByClassName("amcharts-range-selector-to-input")[0].value;
-              console.log(from+to);
+              // console.log(from+to);
               axios.get("http://127.0.0.1:5000/api/countries_?from="+from+"&to="+to)
                 .then( function(Response) {
                   this.rows = Response.data.countries;
@@ -283,6 +283,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
             "filter": function filter(Shown) {
               var temp = [...this.realrows];
               this.realrows.forEach(function(cou, ind){
+                // console.log(this.realrows);
                 if(!Shown[cou.id]){
                   // console.log(cou.id);
                   if(temp.indexOf(cou)  > -1)
@@ -291,6 +292,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
                 // if(this.records[cou.id])
                 //   this.records[cou.id].isActive = this.Shown[cou.id];
               }.bind(this));
+              // console.log("sadasdasd");
               this.rows = temp;
             },
             "clear": function clear() {
@@ -308,7 +310,7 @@ import { cos } from '@amcharts/amcharts4/.internal/core/utils/Math';
                 if (this.rows.length == 0) {
                     return [];
                 }
-                console.log(Object.keys(this.rows[0]));
+                // console.log(Object.keys(this.rows[0]));
                 return Object.keys(this.rows[0]);
             },
             "datashowing": function datashowing() {

@@ -61,6 +61,11 @@ def get_short(data):
             return cou["short"]
     return "None"
 
+def get_name(short):
+    for cou in ZH_2_EN:
+        if cou["short"] == short:
+            return cou["name"]
+    return None
 
 app = Flask(__name__,
             static_folder = "./dist/static",
@@ -117,18 +122,35 @@ def countries(type):
     # print(response)
     return jsonify(response)
 
-# 新增确诊 新增死亡 重症病例 累计确诊 累计治愈 仍在治疗 累计死亡 
+# 新增确诊 新增死亡 重症病例 累计确诊 累计治愈 仍在治疗 累计死亡
 
 @app.route('/api/countriesL')
 def countriesL():
     fromD = request.args.get("from")
     toD = request.args.get("to")
     couL = request.args.get("countries").split(",")
+    type = request.args.get("type")
     # for cou in request.args:
     #     counts.append(cou[0])
-    print(fromD, toD, couL)
+    print(type)
+    result = {}
+    for cou in couL:
+        if get_name(cou) == None:
+            continue
+        sql = "select floor(avg(新增确诊)) as 新增确诊, floor(avg(新增死亡)) as 新增死亡, floor(avg(重症病例)) as 重症病例, floor(avg(累计确诊)) as 累计确诊, floor(avg(累计治愈)) as 累计治愈,   floor(avg(仍在治疗)) as 仍在治疗, floor(avg(累计死亡))as 累计死亡, 日期 from yiqing where 日期>='"+request.args.get("from")+"' and 日期<='"+request.args.get("to")+"' and "+type+"!=0 and 国家地区='"+get_name(cou)+"' group by 日期 order  by 日期;"
+        print(sql)
+        dates = SQL_advanced(db, sql)
+        new_dates = []
+        for date in dates:
+            # print(int(time.mktime(date[7].timetuple())) * 1000)
+            new_dates.append({"date": int(time.mktime(date[7].timetuple()))*1000, "新增确诊": date[0], 
+                            "新增死亡": date[1], "重症病例": date[2], "累计确诊": date[3], "累计治愈": date[4], "仍在治疗": date[5], "累计死亡": date[6]})
+        dates = new_dates
+        result[cou] = dates
+
+
     response = {
-        "countries": "sadsad"
+        "countries": result
     }
 
     return jsonify(response)
