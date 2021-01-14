@@ -477,7 +477,7 @@ export default {
             // var count = 1;
             // var length = countries.length;
             // var merged;
-            var data = [...Response.data.countries[Object.keys(Response.data.countries)[0]]];
+            // var data = [...Response.data.countries[Object.keys(Response.data.countries)[0]]];
             var data = [];
             // var couu = ;
             Response.data.countries[Object.keys(Response.data.countries)[0]].forEach(function(cou, index){
@@ -533,7 +533,7 @@ export default {
                   }
 
                   var keyss = Object.keys(data[0]);
-                  for(var i=1; i<keyss.length; i++){
+                  for(i=1; i<keyss.length; i++){
                     createSeries(keyss[i], keyss[i]);
 
                   }
@@ -583,7 +583,7 @@ export default {
             // var count = 1;
             // var length = countries.length;
             // var merged;
-            var data = [...Response.data.countries[Object.keys(Response.data.countries)[0]]];
+            // var data = [...Response.data.countries[Object.keys(Response.data.countries)[0]]];
             var data = [];
             // var couu = ;
             Response.data.countries[Object.keys(Response.data.countries)[0]].forEach(function(cou, index){
@@ -639,7 +639,7 @@ export default {
                   }
 
                   var keyss = Object.keys(data[0]);
-                  for(var i=1; i<keyss.length; i++){
+                  for(i=1; i<keyss.length; i++){
                     createSeries(keyss[i], keyss[i]);
 
                   }
